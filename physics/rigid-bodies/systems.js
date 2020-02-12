@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import {Box} from './renderers';
 import Matter from 'matter-js';
+import {Cir} from '../../CircleBox';
 
 let boxIds = 0;
 
@@ -22,20 +23,16 @@ const CreateBox = (state, {touches, screen}) => {
   touches
     .filter(t => t.type === 'press')
     .forEach(t => {
-      let body = Matter.Bodies.rectangle(
-        t.event.pageX,
-        t.event.pageY,
-        boxSize,
-        boxSize,
-        {frictionAir: 0.21},
-      );
+      let body = Matter.Bodies.circle(t.event.pageX, t.event.pageY, boxSize/2, {
+        frictionAir: 0.021,
+      });
       Matter.World.add(world, [body]);
 
       state[++boxIds] = {
         body: body,
         size: [boxSize, boxSize],
         color: boxIds % 2 == 0 ? 'pink' : '#B8E986',
-        renderer: Box,
+        renderer: Cir,
       };
     });
 
