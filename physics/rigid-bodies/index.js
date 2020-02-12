@@ -5,6 +5,10 @@ import {Physics, CreateBox, MoveBox, CleanBoxes} from './systems';
 import {Box} from './renderers';
 import Matter from 'matter-js';
 
+import MatterAttractor from 'matter-attractors';
+
+Matter.use(MatterAttractor);
+
 Matter.Common.isElement = () => false; //-- Overriding this function because the original references HTMLElement
 
 export default class RigidBodies extends Component {
@@ -37,6 +41,27 @@ export default class RigidBodies extends Component {
       angularStiffness: 1,
     });
 
+    engine.world.gravity.scale = 0;
+
+    // create a body with an attractor
+    var attractiveBody = Matter.Bodies.circle(100, 100, 50, {
+      isStatic: true,
+
+      // example of an attractor function that
+      // returns a force vector that applies to bodyB
+      plugin: {
+        attractors: [
+          function(bodyA, bodyB) {
+            return {
+              x: (bodyA.position.x - bodyB.position.x) * 1e-6,
+              y: (bodyA.position.y - bodyB.position.y) * 1e-6,
+            };
+          },
+        ],
+      },
+    });
+
+    Matter.World.add(world, attractiveBody);
     Matter.World.add(world, [body, floor]);
     Matter.World.addConstraint(world, constraint);
 

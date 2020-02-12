@@ -2,7 +2,7 @@ import _ from 'lodash';
 import {Box} from './renderers';
 import Matter from 'matter-js';
 import {Cir} from '../../CircleBox';
-
+import {Rec} from '../../RectBox';
 let boxIds = 0;
 
 const distance = ([x1, y1], [x2, y2]) =>
@@ -23,9 +23,15 @@ const CreateBox = (state, {touches, screen}) => {
   touches
     .filter(t => t.type === 'press')
     .forEach(t => {
-      let body = Matter.Bodies.circle(t.event.pageX, t.event.pageY, boxSize/2, {
-        frictionAir: 0.021,
-      });
+      let body = Matter.Bodies.polygon(
+        t.event.pageX,
+        t.event.pageY,
+        4,
+        boxSize / 2,
+        {
+          frictionAir: 0.021,
+        },
+      );
       Matter.World.add(world, [body]);
 
       state[++boxIds] = {
