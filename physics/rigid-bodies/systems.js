@@ -18,28 +18,51 @@ const Physics = (state, {touches, time}) => {
 
 const CreateBox = (state, {touches, screen}) => {
   let world = state['physics'].world;
-  let boxSize = Math.trunc(Math.max(screen.width, screen.height) * 0.075);
+  let boxSize = Math.trunc(Math.max(screen.width, screen.height) * 0.0975);
 
   touches
     .filter(t => t.type === 'press')
     .forEach(t => {
-      let body = Matter.Bodies.polygon(
-        t.event.pageX,
-        t.event.pageY,
-        4,
-        boxSize / 2,
-        {
-          frictionAir: 0.021,
-        },
-      );
-      Matter.World.add(world, [body]);
+      if (boxIds == 0) {
+        var attractiveBody = Matter.Bodies.circle(200, 400, boxSize / 2, {
+          plugin: {
+            attractors: [
+              function(bodyA, bodyB) {
+                return {
+                  x: (bodyA.position.x - bodyB.position.x) * 1e-6,
+                  y: (bodyA.position.y - bodyB.position.y) * 1e-6,
+                };
+              },
+            ],
+          },
+        });
+        Matter.World.add(world, [attractiveBody]);
 
-      state[++boxIds] = {
-        body: body,
-        size: [boxSize, boxSize],
-        color: boxIds % 2 == 0 ? 'pink' : '#B8E986',
-        renderer: Cir,
-      };
+        state[++boxIds] = {
+          body: attractiveBody,
+          size: [boxSize, boxSize],
+          color: boxIds % 2 == 0 ? 'orange' : 'orange',
+          renderer: Cir,
+        };
+      } else {
+        let body = Matter.Bodies.circle(
+          t.event.pageX,
+          t.event.pageY,
+          boxSize / 4,
+          {
+            frictionAir: 0.01,
+          },
+        );
+        Matter.World.add(world, [body]);
+        Matter.Body.setMass(body, 0.05);
+
+        state[++boxIds] = {
+          body: body,
+          size: [boxSize / 2, boxSize / 2],
+          color: boxIds % 2 == 0 ? 'yellow' : 'black',
+          renderer: Cir,
+        };
+      }
     });
 
   return state;
