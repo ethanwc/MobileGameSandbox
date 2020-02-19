@@ -34,7 +34,7 @@ export default class RigidBodies extends Component {
 
     engine.world.gravity.scale = 0;
 
-    Matter.World.addConstraint(world, constraint);
+    // Matter.World.addConstraint(world, constraint);
 
     return (
       <GameEngine

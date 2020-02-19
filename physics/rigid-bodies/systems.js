@@ -3,6 +3,9 @@ import {Box} from './renderers';
 import Matter from 'matter-js';
 import {Cir} from '../../CircleBox';
 import {Rec} from '../../RectBox';
+
+import MatterAttractor from 'matter-attractors';
+
 let boxIds = 0;
 
 const distance = ([x1, y1], [x2, y2]) =>
@@ -24,9 +27,12 @@ const CreateBox = (state, {touches, screen}) => {
     .filter(t => t.type === 'press')
     .forEach(t => {
       if (boxIds == 0) {
-        var attractiveBody = Matter.Bodies.circle(200, 400, boxSize / 2, {
+        var attractiveBody = Matter.Bodies.circle(100, 200, boxSize / 2, {
+          isStatic: true,
           plugin: {
             attractors: [
+              // MatterAttractor.Attractors.gravity,
+
               function(bodyA, bodyB) {
                 return {
                   x: (bodyA.position.x - bodyB.position.x) * 1e-6,
@@ -44,13 +50,63 @@ const CreateBox = (state, {touches, screen}) => {
           color: boxIds % 2 == 0 ? 'orange' : 'orange',
           renderer: Cir,
         };
-      } else {
+      }
+      //  else if (boxIds == 1) {
+      //   var attractiveBody = Matter.Bodies.circle(300, 200, boxSize / 2, {
+      //     isStatic: true,
+      //     plugin: {
+      //       attractors: [
+      //         // MatterAttractor.Attractors.gravity,
+
+      //         function(bodyA, bodyB) {
+      //           return {
+      //             x: (bodyA.position.x - bodyB.position.x) * 1e-6,
+      //             y: (bodyA.position.y - bodyB.position.y) * 1e-6,
+      //           };
+      //         },
+      //       ],
+      //     },
+      //   });
+      //   Matter.World.add(world, [attractiveBody]);
+
+      //   state[++boxIds] = {
+      //     body: attractiveBody,
+      //     size: [boxSize, boxSize],
+      //     color: boxIds % 2 == 0 ? 'blue' : 'blue',
+      //     renderer: Cir,
+      //   };
+      // } else if (boxIds == 2) {
+      //   var attractiveBody = Matter.Bodies.circle(200, 400, boxSize / 2, {
+      //     isStatic: true,
+      //     plugin: {
+      //       attractors: [
+      //         // MatterAttractor.Attractors.gravity,
+
+      //         function(bodyA, bodyB) {
+      //           return {
+      //             x: (bodyA.position.x - bodyB.position.x) * 1e-6,
+      //             y: (bodyA.position.y - bodyB.position.y) * 1e-6,
+      //           };
+      //         },
+      //       ],
+      //     },
+      //   });
+      //   Matter.World.add(world, [attractiveBody]);
+
+      //   state[++boxIds] = {
+      //     body: attractiveBody,
+      //     size: [boxSize, boxSize],
+      //     color: boxIds % 2 == 0 ? 'blue' : 'blue',
+      //     renderer: Cir,
+      //   };
+      // } 
+      else {
         let body = Matter.Bodies.circle(
           t.event.pageX,
           t.event.pageY,
           boxSize / 4,
           {
-            frictionAir: 0.01,
+            frictionAir: 0.0,
           },
         );
         Matter.World.add(world, [body]);
@@ -59,7 +115,7 @@ const CreateBox = (state, {touches, screen}) => {
         state[++boxIds] = {
           body: body,
           size: [boxSize / 2, boxSize / 2],
-          color: boxIds % 2 == 0 ? 'yellow' : 'black',
+          color: boxIds % 2 == 0 ? 'black' : 'black',
           renderer: Cir,
         };
       }
