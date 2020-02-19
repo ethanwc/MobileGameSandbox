@@ -3,7 +3,7 @@ import {StyleSheet, View, ART, Dimensions} from 'react-native';
 import Svg, {Path, Rect} from 'react-native-svg';
 import {Vector} from 'matter-js';
 
-class Cir extends Component {
+class Sun extends Component {
   constructor(props) {
     super(props);
   }
@@ -15,23 +15,23 @@ class Cir extends Component {
     const y = this.props.body.position.y - height / 2;
     const angle = this.props.body.angle;
 
-    const render =
-      x && y ? (
-        <View
-          style={{
-            position: 'absolute',
-            left: x,
-            top: y,
-            width: width,
-            height: height,
-            borderRadius: 100,
-            transform: [{rotate: angle + 'rad'}],
-            backgroundColor: this.props.color || 'blue',
-          }}
-        />
-      ) : null;
-    return render;
+    console.log(x, y);
+
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          left: x,
+          top: y,
+          width: width,
+          height: height,
+          borderRadius: 100,
+          transform: [{rotate: angle + 'rad'}],
+          backgroundColor: this.props.color || 'blue',
+        }}
+      />
+    );
   }
 }
 
-export {Cir};
+export {Sun};

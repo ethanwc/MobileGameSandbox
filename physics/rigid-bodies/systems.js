@@ -3,6 +3,9 @@ import {Box} from './renderers';
 import Matter from 'matter-js';
 import {Cir} from '../../CircleBox';
 import {Rec} from '../../RectBox';
+import {Sun} from '../../SunBox';
+import MatterAttractor from 'matter-attractors';
+
 let boxIds = 0;
 
 const distance = ([x1, y1], [x2, y2]) =>
@@ -19,47 +22,62 @@ const Physics = (state, {touches, time}) => {
 const CreateBox = (state, {touches, screen}) => {
   let world = state['physics'].world;
   let boxSize = Math.trunc(Math.max(screen.width, screen.height) * 0.0975);
+  MatterAttractor.Attractors.gravityConstant = 0.00000002;
 
   touches
     .filter(t => t.type === 'press')
     .forEach(t => {
-      if (boxIds == 0) {
-        var attractiveBody = Matter.Bodies.circle(200, 400, boxSize / 2, {
-          plugin: {
-            attractors: [
-              function(bodyA, bodyB) {
-                return {
-                  x: (bodyA.position.x - bodyB.position.x) * 1e-6,
-                  y: (bodyA.position.y - bodyB.position.y) * 1e-6,
-                };
-              },
-            ],
+      if (boxIds < 1) {
+        var attractiveBody = Matter.Bodies.circle(
+          t.event.pageX,
+          t.event.pageY,
+          boxSize / 2,
+          {
+            isStatic: true,
+
+            plugin: {
+              attractors: [
+                MatterAttractor.Attractors.gravity,
+                // function(bodyA, bodyB) {
+                //   return {
+                //     x: (bodyA.position.x - bodyB.position.x) * 1e-6,
+                //     y: (bodyA.position.y - bodyB.position.y) * 1e-6,
+                //   };
+                // },
+              ],
+            },
           },
-        });
+        );
+
+        Matter.Body.setMass(attractiveBody, 1000000000);
+
         Matter.World.add(world, [attractiveBody]);
 
         state[++boxIds] = {
           body: attractiveBody,
           size: [boxSize, boxSize],
           color: boxIds % 2 == 0 ? 'orange' : 'orange',
-          renderer: Cir,
+          renderer: Sun,
         };
       } else {
         let body = Matter.Bodies.circle(
           t.event.pageX,
           t.event.pageY,
-          boxSize / 4,
+          boxSize / 8,
           {
-            frictionAir: 0.01,
+            frictionAir: 0,
           },
         );
         Matter.World.add(world, [body]);
-        Matter.Body.setMass(body, 0.05);
+
+        Matter.Body.setVelocity(body, {x: 5, y: -5});
+
+        Matter.Body.setMass(body, .5);
 
         state[++boxIds] = {
           body: body,
-          size: [boxSize / 2, boxSize / 2],
-          color: boxIds % 2 == 0 ? 'yellow' : 'black',
+          size: [boxSize / 4, boxSize / 4],
+          color: boxIds % 2 == 0 ? 'black' : 'black',
           renderer: Cir,
         };
       }
